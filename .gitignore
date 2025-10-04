@@ -1,0 +1,52 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so                      # compiled shared objects (C++ extensions)
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# Virtual environments
+.venv/
+env/
+venv/
+.uv/                      # uv creates a cache dir sometimes
+
+# Test / coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+ruff_cache/
+*.log
+
+# ---- C++ / CMake build ----
+build/
+dist/
+*.o
+*.obj
+*.dll
+*.dylib
+*.lib
+*.a
+*.pdb
+
+# scikit-build / CMake intermediates
+backend/_skbuild/
+backend/build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.cmake
+Makefile
+
+# ---- OS / Editor / Misc ----
+.DS_Store                # macOS Finder cruft
+Thumbs.db                # Windows Explorer cruft
+.idea/                   # JetBrains IDEs
+.vscode/                 # VSCode workspace settings
+*.swp                    # vim swap files
