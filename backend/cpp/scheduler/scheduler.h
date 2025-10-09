@@ -20,4 +20,6 @@ struct Process {
 };
 
 std::vector<Process> fcfsScheduler(const std::vector<Process> &processes);
+
+std::vector<Process> sjfScheduler(const std::vector<Process> &processes);
 } // namespace scheduler
