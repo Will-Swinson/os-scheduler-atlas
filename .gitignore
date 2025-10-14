@@ -15,6 +15,8 @@ __pycache__/
 env/
 venv/
 .uv/                      # uv creates a cache dir sometimes
+.env*
+!.env.example
 
 # Test / coverage
 .pytest_cache/
