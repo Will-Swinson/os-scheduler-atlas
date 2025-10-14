@@ -86,6 +86,7 @@ The goal: an educational and engineering playground that touches every layer of 
 ### 7. Testing
 - Unit tests (Pytest for backend, Catch2 for C++).
 - Integration test: simulate workload → store → retrieve from DB.
+- System tests
 
 ---
 
