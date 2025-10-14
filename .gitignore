@@ -8,6 +8,7 @@ __pycache__/
 *.egg
 *.manifest
 *.spec
+*.pypirc
 
 # Virtual environments
 .venv/
