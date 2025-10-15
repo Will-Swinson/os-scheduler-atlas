@@ -19,7 +19,7 @@ ext_modules = [
 
 setup(
     name="os-scheduler-atlas",
-    version="0.1.0",
+    version="0.2.0",
     author="Will Swinson",
     description="OS Scheduling Algorithms with ML Prediction",
     packages=find_packages(),
