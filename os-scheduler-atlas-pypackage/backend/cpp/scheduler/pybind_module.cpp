@@ -46,9 +46,57 @@ py::list fcfs_scheduler_wrapper(py::list process_list) {
   return result_process_list;
 }
 
+py::list sjf_scheduler_wrapper(py::list process_list) {
+  std::vector<Process> processes;
+
+  for (const auto &process : process_list) {
+    Process convertedProcess = dict_to_process(process.cast<py::dict>());
+    processes.push_back(convertedProcess);
+  }
+
+  std::vector<Process> result = sjfScheduler(processes);
+
+  py::list result_process_list;
+
+  for (const auto &process : result) {
+    py::dict convertedProcess = process_to_dict(process);
+    result_process_list.append(convertedProcess);
+  }
+
+  return result_process_list;
+}
+
+py::list round_robin_scheduler_wrapper(py::list process_list,
+                                       int time_quantum) {
+  std::vector<Process> processes;
+
+  for (const auto &process : process_list) {
+    Process convertedProcess = dict_to_process(process.cast<py::dict>());
+    processes.push_back(convertedProcess);
+  }
+
+  std::vector<Process> result = roundRobinScheduler(processes, time_quantum);
+
+  py::list result_process_list;
+
+  for (const auto &process : result) {
+    py::dict convertedProcess = process_to_dict(process);
+    result_process_list.append(convertedProcess);
+  }
+
+  return result_process_list;
+}
+
 PYBIND11_MODULE(scheduler_cpp, m) {
   m.doc() = "OS Scheduling Algorithms";
 
   m.def("fcfs_scheduler", &fcfs_scheduler_wrapper,
         "First Come First Served scheduling algorithm", py::arg("processes"));
+
+  m.def("sjf_scheduler", &sjf_scheduler_wrapper,
+        "Shortest Job First scheduling algorithm", py::arg("processes"));
+
+  m.def("round_robin_scheduler", &round_robin_scheduler_wrapper,
+        "Round Robin scheduling algorithm", py::arg("processes"),
+        py::arg("time_quantum"));
 }
