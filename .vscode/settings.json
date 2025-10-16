@@ -56,5 +56,10 @@
   },
   "cmake.sourceDirectory": "/Users/will/Desktop/code/os-scheduler-atlas/backend/cpp",
   "cmake.buildDirectory": "${workspaceFolder}/backend/cpp/build",
-  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  }
 }
