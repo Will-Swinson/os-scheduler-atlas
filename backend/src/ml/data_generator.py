@@ -1,10 +1,8 @@
-import scheduler_cpp
+import scheduler_cpp  # type: ignore
 import random
 import numpy as np
 import pandas as pd
-from typing import List, Dict, Tuple
-import json
-from datetime import datetime
+from typing import List, Dict
 
 
 class WorkloadGenerator:
@@ -107,9 +105,7 @@ class WorkloadGenerator:
 
         return metrics
 
-    def generate_training_dataset(
-        self, samples_per_scenario: int = 100
-    ) -> pd.DataFrame:
+    def generate_training_dataset(self, samples_per_scenario: int = 10) -> pd.DataFrame:
         """Generate complete training dataset"""
         dataset = []
         scenarios = ["cpu_bound", "io_bound", "mixed"]
