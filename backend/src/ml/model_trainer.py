@@ -74,12 +74,7 @@ class ModelTrainer:
 
         y_pred = model.predict(X_test)
 
-        print(y_test)
-        print(y_pred)
-
         accuracy = accuracy_score(y_test, y_pred)
-
-        # TODO - Save model to a pkl file
 
         return {"accuracy": accuracy, "model": "RandomForestClassifier"}
 

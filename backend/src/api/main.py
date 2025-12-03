@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Depends
 from .models import (
     SimulationRequest,
     SimulationResponse,
@@ -7,13 +7,34 @@ from .models import (
     Process,
 )
 import scheduler_cpp  # type: ignore
-from typing import List, Dict
+from typing import List, Dict, Annotated
 from uuid import uuid4
 import pandas as pd
 from ..ml.feature_engineer import FeatureEngineer
 from ..ml.model_trainer import ModelTrainer
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    model = ModelTrainer()
+    app.state.model = model
+    app.state.loaded_model = model.load_model()
+
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+def get_model(request: Request):
+    return {
+        "model": request.app.state.model,
+        "loaded_model": request.app.state.loaded_model,
+    }
+
+
+model_deps = Annotated[ModelTrainer, Depends(get_model)]
 
 
 def run_scheduler(
@@ -39,6 +60,9 @@ def analyze_process_workload(processes: List[Process]) -> pd.DataFrame:
 
     Future: Could move to ApiUtils or WorkloadAnalyzer class
     """
+
+    if processes is None:
+        raise ValueError("Cannot analyze processes for empty process lists")
 
     process_dicts = [process.model_dump() for process in processes]
 
@@ -81,11 +105,13 @@ async def simulate(request: SimulationRequest) -> SimulationResponse:
 
 
 @app.post("/predict")
-async def predict(request: PredictionRequest) -> PredictionResponse:
+async def predict(
+    model_info: model_deps, request: PredictionRequest
+) -> PredictionResponse:
     workload_features = analyze_process_workload(request.processes)
 
-    model = ModelTrainer()
-    loaded_model = model.load_model()
+    model = model_info["model"]
+    loaded_model = model_info["loaded_model"]
 
     predictions = model.predict_best_algorithm(workload_features)
 
