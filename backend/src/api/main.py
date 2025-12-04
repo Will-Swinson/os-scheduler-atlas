@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Depends
 from .models import (
     SimulationRequest,
     SimulationResponse,
@@ -7,19 +7,57 @@ from .models import (
     Process,
 )
 import scheduler_cpp  # type: ignore
-from typing import List, Dict
+from typing import List, Dict, Annotated
 from uuid import uuid4
 import pandas as pd
 from ..ml.feature_engineer import FeatureEngineer
 from ..ml.model_trainer import ModelTrainer
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Initialize and attach a ModelTrainer and its loaded model to the FastAPI app state for the application's lifespan.
+
+    Sets app.state.model to a ModelTrainer instance with its model already loaded, then yields control so the application can continue startup and serve requests.
+    """
+    model = ModelTrainer()
+    model.load_model()
+    app.state.model = model
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+def get_model(request: Request):
+    return request.app.state.model
+
+
+model_deps = Annotated[ModelTrainer, Depends(get_model)]
 
 
 def run_scheduler(
     processes: List[Process], algorithm_choice: str, time_quantum: int = 2
-) -> Dict:
+) -> List[Dict]:
+    """
+    Run the specified CPU scheduling algorithm on a list of processes.
+
+    Parameters:
+        processes (List[Process]): Processes to be scheduled.
+        algorithm_choice (str): Scheduling algorithm to use; one of "FCFS", "SJF", or "RR".
+        time_quantum (int): Time quantum for round-robin scheduling; only used when `algorithm_choice` is "RR".
+
+    Returns:
+        scheduler_result (List[Dict]): The scheduler's result as a dictionary.
+
+    """
+
     process_dicts = [process.model_dump() for process in processes]
+
+    if not process_dicts:
+        raise ValueError("Cannot analyze processes for empty process lists")
 
     algorithms = {
         "FCFS": scheduler_cpp.fcfs_scheduler,
@@ -35,10 +73,20 @@ def run_scheduler(
 
 def analyze_process_workload(processes: List[Process]) -> pd.DataFrame:
     """
-    Convert API process list to ML-ready DataFrame
+    Create a single-row, ML-ready DataFrame of workload features derived from an API list of Process objects.
 
-    Future: Could move to ApiUtils or WorkloadAnalyzer class
+    Parameters:
+        processes (List[Process]): List of Process models representing the workload. Must contain at least one process.
+
+    Returns:
+        pd.DataFrame: A single-row DataFrame containing aggregate workload statistics (e.g., num_processes, avg_burst_time, max_burst_time, min_burst_time, arrival_spread) augmented with engineered workload features and pattern columns produced by FeatureEngineer.
+
+    Raises:
+        ValueError: If `processes` is None or empty.
     """
+
+    if not processes:
+        raise ValueError("Cannot analyze processes for empty process lists")
 
     process_dicts = [process.model_dump() for process in processes]
 
@@ -63,6 +111,18 @@ def analyze_process_workload(processes: List[Process]) -> pd.DataFrame:
 
 @app.post("/simulate")
 async def simulate(request: SimulationRequest) -> SimulationResponse:
+    """
+    Run the requested scheduling simulation and return a SimulationResponse with the results.
+
+    Parameters:
+        request (SimulationRequest): Contains the processes to schedule, the algorithm name, and optional time_quantum for round-robin.
+
+    Returns:
+        SimulationResponse: Contains a generated `simulation_id`, the `algorithm_used`, and `results` which include:
+            - `processes`: scheduler output list,
+            - `total_processes`: number of output processes,
+            - `simulation_metadata`: dict containing `time_quantum` only when the algorithm is "RR".
+    """
     scheduler_output = run_scheduler(
         request.processes, request.algorithm, request.time_quantum
     )
@@ -81,20 +141,30 @@ async def simulate(request: SimulationRequest) -> SimulationResponse:
 
 
 @app.post("/predict")
-async def predict(request: PredictionRequest) -> PredictionResponse:
+async def predict(
+    model_base: model_deps, request: PredictionRequest
+) -> PredictionResponse:
+    """
+    Predict the best scheduling algorithm for the given processes using the preloaded model.
+
+    Parameters:
+        request (PredictionRequest): Request containing the list of processes to analyze and predict for.
+
+    Returns:
+        PredictionResponse: Object with:
+            predicted_algorithm (str): The algorithm name selected by the model.
+            model_confidence (float): The model's probability for the selected algorithm (0.0–1.0).
+            features_used (dict): The workload features derived from the input processes used for prediction.
+    """
     workload_features = analyze_process_workload(request.processes)
 
-    model = ModelTrainer()
-    loaded_model = model.load_model()
-
-    predictions = model.predict_best_algorithm(workload_features)
+    predictions = model_base.predict_best_algorithm(workload_features)
 
     predicted_algorithm = predictions[0]
 
-    prediction_probs = loaded_model.predict_proba(
-        workload_features[model.feature_columns]
+    prediction_probs = model_base.model.predict_proba(
+        workload_features[model_base.feature_columns]
     )
-
     confidence = float(prediction_probs[0].max())
 
     return PredictionResponse(
