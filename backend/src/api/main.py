@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     """
     Initialize and attach a ModelTrainer and its loaded model to the FastAPI app state for the application's lifespan.
 
-    Sets app.state.model to a ModelTrainer instance and app.state.loaded_model to the trainer's loaded model, then yields control so the application can continue startup and serve requests.
+    Sets app.state.model to a ModelTrainer instance with its model already loaded, then yields control so the application can continue startup and serve requests.
     """
     model = ModelTrainer()
     model.load_model()
@@ -50,13 +50,14 @@ def run_scheduler(
         time_quantum (int): Time quantum for round-robin scheduling; only used when `algorithm_choice` is "RR".
 
     Returns:
-        scheduler_result (Dict): The scheduler's result as a dictionary.
+        scheduler_result (List[Dict]): The scheduler's result as a dictionary.
 
-    Raises:
-        ValueError: If `algorithm_choice` is not one of the supported algorithms.
     """
 
     process_dicts = [process.model_dump() for process in processes]
+
+    if not process_dicts:
+        raise ValueError("Cannot analyze processes for empty process lists")
 
     algorithms = {
         "FCFS": scheduler_cpp.fcfs_scheduler,
@@ -81,7 +82,7 @@ def analyze_process_workload(processes: List[Process]) -> pd.DataFrame:
         pd.DataFrame: A single-row DataFrame containing aggregate workload statistics (e.g., num_processes, avg_burst_time, max_burst_time, min_burst_time, arrival_spread) augmented with engineered workload features and pattern columns produced by FeatureEngineer.
 
     Raises:
-        ValueError: If `processes` is None.
+        ValueError: If `processes` is None or empty.
     """
 
     if not processes:
