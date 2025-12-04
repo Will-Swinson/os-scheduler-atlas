@@ -78,7 +78,7 @@ class WorkloadGenerator:
 
         return results
 
-    def calculate_metrics(self, results: List[Dict]) -> Dict:
+    def calculate_metrics(self, results: Dict[str, List[Dict]]) -> Dict:
         """Calculate performance metrics from scheduler results"""
         metrics = {}
 

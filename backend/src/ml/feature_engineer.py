@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 class FeatureEngineer:
@@ -24,23 +25,21 @@ class FeatureEngineer:
 
     def add_performance_ratios(_, df: pd.DataFrame) -> pd.DataFrame:
         """Calculate performance ratios between algorithms"""
-        df["sjf_vs_fcfs_waiting"] = (
-            df["sjf_results_avg_waiting_time"] / df["fcfs_results_avg_waiting_time"]
-        )
+        df["sjf_vs_fcfs_waiting"] = df["sjf_results_avg_waiting_time"] / df[
+            "fcfs_results_avg_waiting_time"
+        ].replace(0, np.nan)
 
-        df["sjf_vs_fcfs_throughput"] = (
-            df["sjf_results_throughput"] / df["fcfs_results_throughput"]
-        )
+        df["sjf_vs_fcfs_throughput"] = df["sjf_results_throughput"] / df[
+            "fcfs_results_throughput"
+        ].replace(0, np.nan)
 
-        df["round_robin_vs_fcfs_waiting"] = (
-            df["round_robin_results_avg_waiting_time"]
-            / df["fcfs_results_avg_waiting_time"]
-        )
+        df["round_robin_vs_fcfs_waiting"] = df[
+            "round_robin_results_avg_waiting_time"
+        ] / df["fcfs_results_avg_waiting_time"].replace(0, np.nan)
 
-        df["round_robin_vs_sjf_waiting"] = (
-            df["round_robin_results_avg_waiting_time"]
-            / df["sjf_results_avg_waiting_time"]
-        )
+        df["round_robin_vs_sjf_waiting"] = df[
+            "round_robin_results_avg_waiting_time"
+        ] / df["sjf_results_avg_waiting_time"].replace(0, np.nan)
 
         return df
 

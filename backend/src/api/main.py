@@ -61,7 +61,7 @@ def analyze_process_workload(processes: List[Process]) -> pd.DataFrame:
     Future: Could move to ApiUtils or WorkloadAnalyzer class
     """
 
-    if processes is None:
+    if not processes:
         raise ValueError("Cannot analyze processes for empty process lists")
 
     process_dicts = [process.model_dump() for process in processes]
