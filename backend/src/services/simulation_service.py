@@ -1,4 +1,7 @@
 def calculate_avg_metrics(scheduler_output):
+    if not scheduler_output:
+        raise ValueError("scheduler_output must be non-empty")
+
     avg_waiting_time = sum(p["waiting_time"] for p in scheduler_output) / len(
         scheduler_output
     )
