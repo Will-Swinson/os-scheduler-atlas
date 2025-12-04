@@ -99,6 +99,10 @@ py::list sjf_scheduler_wrapper(py::list process_list) {
  */
 py::list round_robin_scheduler_wrapper(py::list process_list,
                                        int time_quantum) {
+  if (time_quantum <= 0) {
+    throw std::invalid_argument("Time Quantum must be a positive value.");
+  }
+
   std::vector<Process> processes;
 
   for (const auto &process : process_list) {
