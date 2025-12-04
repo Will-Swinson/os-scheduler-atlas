@@ -93,7 +93,7 @@ def analyze_process_workload(processes: List[Process]) -> pd.DataFrame:
         ValueError: If `processes` is None.
     """
 
-    if processes is None:
+    if not processes:
         raise ValueError("Cannot analyze processes for empty process lists")
 
     process_dicts = [process.model_dump() for process in processes]

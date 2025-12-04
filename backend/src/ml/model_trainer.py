@@ -185,6 +185,9 @@ class ModelTrainer:
                 "Model must be trained first. Call train_model() before making predictions."
             )
 
+        if self.feature_columns is None:
+            self._set_feature_columns()
+
         X = workload_features[self.feature_columns]
 
         predictions = self.model.predict(X)

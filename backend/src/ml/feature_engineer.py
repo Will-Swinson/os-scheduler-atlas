@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 class FeatureEngineer:
@@ -57,23 +58,23 @@ class FeatureEngineer:
                 `round_robin_vs_fcfs_waiting`: ratio of Round Robin average waiting time to FCFS average waiting time,
                 `round_robin_vs_sjf_waiting`: ratio of Round Robin average waiting time to SJF average waiting time.
         """
-        df["sjf_vs_fcfs_waiting"] = (
-            df["sjf_results_avg_waiting_time"] / df["fcfs_results_avg_waiting_time"]
-        )
+        
+        df["sjf_vs_fcfs_waiting"] = df["sjf_results_avg_waiting_time"] / df[
+            "fcfs_results_avg_waiting_time"
+        ].replace(0, np.nan)
 
-        df["sjf_vs_fcfs_throughput"] = (
-            df["sjf_results_throughput"] / df["fcfs_results_throughput"]
-        )
 
-        df["round_robin_vs_fcfs_waiting"] = (
-            df["round_robin_results_avg_waiting_time"]
-            / df["fcfs_results_avg_waiting_time"]
-        )
+        df["sjf_vs_fcfs_throughput"] = df["sjf_results_throughput"] / df[
+            "fcfs_results_throughput"
+        ].replace(0, np.nan)
 
-        df["round_robin_vs_sjf_waiting"] = (
-            df["round_robin_results_avg_waiting_time"]
-            / df["sjf_results_avg_waiting_time"]
-        )
+        df["round_robin_vs_fcfs_waiting"] = df[
+            "round_robin_results_avg_waiting_time"
+        ] / df["fcfs_results_avg_waiting_time"].replace(0, np.nan)
+
+        df["round_robin_vs_sjf_waiting"] = df[
+            "round_robin_results_avg_waiting_time"
+        ] / df["sjf_results_avg_waiting_time"].replace(0, np.nan)
 
         return df
 
