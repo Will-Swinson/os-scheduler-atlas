@@ -1,7 +1,9 @@
 def get_simulate_request_type(data):
     """
-    Auto-detect request type and inject request_type field.
-    This function both detects AND modifies the incoming data.
+    Auto-detect request type based on prediction_id.
+    This function detects the incoming data.
+
+    Returns 'prediction' if the data contains prediction_id, otherwise 'normal'.
     """
 
     # Handle raw dict (most common case)
