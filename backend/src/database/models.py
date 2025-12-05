@@ -8,22 +8,6 @@ class Base(DeclarativeBase):
     pass
 
 
-# Workloads is a one to many with Processes
-# Workloads is a one to Many with Simulations
-# Workloads is a one to one with Predictions
-
-# Simulations is a many to one with Workloads
-# Simulations is a Many to one with Predictions
-# Simulation no relation with Processes
-
-# Process is a many to one with Workloads
-# Process has no other references
-
-# Predictions is a one to Many with Simulations
-# Predictions is a one to one with Workloads
-# Predictions no relation with Processes
-
-
 class Workloads(Base):
     __tablename__ = "workloads"
     id: Mapped[int] = mapped_column(autoincrement=True, primary_key=True)
