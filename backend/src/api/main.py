@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, status, HTTPException
+from fastapi import FastAPI, Depends, status, HTTPException, Request
 from .models import (
     SimulationRequest,
     PredictionSimulationRequest,
@@ -26,6 +26,7 @@ from ..database.queries import (
 )
 from ..services.simulation_service import calculate_avg_metrics
 from .validators import get_simulate_request_type, to_dict
+from contextlib import asynccontextmanager
 
 
 @asynccontextmanager
