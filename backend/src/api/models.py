@@ -23,12 +23,10 @@ class SimulationRequest(BaseModel):
             "example": {
                 "processes": [{"pid": 1, "arrival_time": 0, "burst_time": 5}],
                 "algorithm": "FCFS",
-                "time_quantum": "Provide if you are doing RR",
-                "prediction_id": "Provide if you are referencing a prediction",
+                "time_quantum": 2,
             }
         }
     }
-    request_type: Literal["normal"] = "normal"
     processes: List[Process]
     algorithm: Algorithm
     time_quantum: Optional[int] = Field(
@@ -42,11 +40,11 @@ class PredictionSimulationRequest(BaseModel):
             "example": {
                 "prediction_id": 123,
                 "algorithm": "FCFS",
+                "time_quantum": 2,
             }
         }
     }
 
-    request_type: Literal["prediction"] = "prediction"
     algorithm: Optional[Algorithm] = None
     prediction_id: int
     time_quantum: Optional[int] = Field(

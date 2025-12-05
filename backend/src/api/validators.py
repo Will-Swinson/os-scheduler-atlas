@@ -7,11 +7,7 @@ def get_simulate_request_type(data):
     # Handle raw dict (most common case)
     if isinstance(data, dict):
         if "prediction_id" in data:
-            data["request_type"] = "prediction"
             return "prediction"
-        else:
-            data["request_type"] = "normal"
-            return "normal"
 
     return "normal"
 
@@ -24,7 +20,10 @@ def to_dict(obj):
 
         data.pop("_sa_instance_state", None)
     else:
-        data = dict(obj)
+        try:
+            data = dict(obj)
+        except (TypeError, ValueError) as e:
+            raise TypeError(f"Cannot convert {type(obj).__name__} to dict") from e
 
     if "pid" not in data and "id" in data:
         data["pid"] = data["id"]

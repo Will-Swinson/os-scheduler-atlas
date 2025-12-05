@@ -175,7 +175,6 @@ async def simulate(
 
         scheduler_output = run_scheduler(processes, algorithm, time_quantum)
 
-        print(scheduler_output)
         results = {
             "processes": scheduler_output,
             "total_processes": len(scheduler_output),
@@ -223,7 +222,7 @@ async def simulate(
 
 @app.post("/predict", status_code=status.HTTP_201_CREATED)
 async def predict(db: db_deps, request: PredictionRequest) -> PredictionResponse:
-   """
+    """
     Predict the best scheduling algorithm for the given processes using the preloaded model.
 
     Parameters:
@@ -235,8 +234,8 @@ async def predict(db: db_deps, request: PredictionRequest) -> PredictionResponse
             model_confidence (float): The model's probability for the selected algorithm (0.0–1.0).
             features_used (dict): The workload features derived from the input processes used for prediction.
     """
-    try:
 
+    try:
         workload_features = analyze_process_workload(request.processes)
 
         model = ModelTrainer()
