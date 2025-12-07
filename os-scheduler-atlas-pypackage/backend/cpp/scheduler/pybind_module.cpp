@@ -27,16 +27,14 @@ py::dict process_to_dict(const Process &process) {
 }
 
 /**
- * @brief Schedule a list of processes using First Come First Served and return the scheduled processes.
+ * @brief Run First Come First Served scheduling on a list of process dictionaries.
  *
- * Converts a Python list of process dictionaries into native Process objects, runs the FCFS scheduler,
- * and converts the scheduled Process objects back into a Python list of dictionaries.
- *
- * @param process_list Python list of dictionaries, each representing a process and containing at minimum the keys
- *                     `pid`, `arrival_time`, and `burst_time`.
- * @return py::list Python list of dictionaries representing the scheduled processes. Each dictionary includes
- *                 `pid`, `arrival_time`, `burst_time`, and scheduling result fields such as `waiting_time`,
- *                 `turn_around_time`, `finish_time`, `remaining_time`, and `is_complete`.
+ * @param process_list Python list of dictionaries where each dictionary must contain
+ *                     the keys `pid`, `arrival_time`, and `burst_time` (integers).
+ * @return py::list A Python list of dictionaries representing the scheduled processes.
+ *                  Each dictionary contains the original fields (`pid`, `arrival_time`, `burst_time`)
+ *                  and scheduling results such as `waiting_time`, `turn_around_time`, `finish_time`,
+ *                  `remaining_time`, and `is_complete`.
  */
 py::list fcfs_scheduler_wrapper(py::list process_list) {
   std::vector<Process> processes;
@@ -59,10 +57,18 @@ py::list fcfs_scheduler_wrapper(py::list process_list) {
 }
 
 /**
- * @brief Runs Shortest Job First scheduling on a list of process dictionaries.
+ * @brief Schedules processes using the Shortest Job First algorithm.
  *
- * @param process_list Python list of dicts where each dict represents a process and must contain integer keys `pid`, `arrival_time`, and `burst_time`.
- * @return py::list Python list of dicts representing the scheduled processes; each dict includes `pid`, `arrival_time`, `burst_time`, `waiting_time`, `turn_around_time`, `finish_time`, `remaining_time`, and `is_complete`.
+ * Converts the provided Python list of process dictionaries into C++ Process
+ * objects, runs the SJF scheduler, and returns the scheduled processes as a
+ * Python list of dictionaries.
+ *
+ * @param process_list Python list of dictionaries, each containing the keys
+ *                     `pid`, `arrival_time`, and `burst_time` (all integers).
+ * @return py::list Python list of dictionaries where each dictionary contains
+ *                  `pid`, `arrival_time`, `burst_time`, `waiting_time`,
+ *                  `turn_around_time`, `finish_time`, `remaining_time`, and
+ *                  `is_complete`.
  */
 py::list sjf_scheduler_wrapper(py::list process_list) {
   std::vector<Process> processes;
@@ -85,18 +91,18 @@ py::list sjf_scheduler_wrapper(py::list process_list) {
 }
 
 /**
- * @brief Runs the Round Robin scheduling algorithm on a list of processes.
+ * @brief Apply Round Robin scheduling to a collection of processes using the specified time quantum.
  *
- * Converts a Python list of process dictionaries into Process objects, executes
- * the Round Robin scheduler with the given time quantum, and returns the
- * scheduled processes as a Python list of dictionaries.
- *
- * @param process_list Python list of dicts where each dict contains process fields (e.g., `pid`, `arrival_time`, `burst_time`).
- * @param time_quantum Time slice, in the same time units used by the process fields, to use for the Round Robin scheduler.
- * @return py::list Python list of dicts representing processes after scheduling with updated timing and completion fields.
+ * @param process_list Python list of dictionaries where each dictionary must contain at least `pid`, `arrival_time`, and `burst_time`.
+ * @param time_quantum Time slice used by the Round Robin scheduler (same time units as `burst_time` and `arrival_time`).
+ * @return py::list Python list of process dictionaries augmented with scheduling results: `waiting_time`, `turn_around_time`, `finish_time`, `remaining_time`, and `is_complete`.
  */
 py::list round_robin_scheduler_wrapper(py::list process_list,
                                        int time_quantum) {
+  if (time_quantum <= 0) {
+    throw std::invalid_argument("Time Quantum must be a positive value.");
+  }
+
   std::vector<Process> processes;
 
   for (const auto &process : process_list) {
@@ -117,14 +123,13 @@ py::list round_robin_scheduler_wrapper(py::list process_list,
 }
 
 /**
- * @brief Defines the Python module "scheduler_cpp" and registers scheduling functions.
+ * @brief Creates the Python module exposing OS scheduling algorithm bindings.
  *
- * Initializes the pybind11 module named "scheduler_cpp" with documentation and exposes
- * three scheduler bindings: `fcfs_scheduler`, `sjf_scheduler`, and `round_robin_scheduler`.
- *
- * - `fcfs_scheduler(processes)`: First Come First Served scheduling algorithm.
- * - `sjf_scheduler(processes)`: Shortest Job First scheduling algorithm.
- * - `round_robin_scheduler(processes, time_quantum)`: Round Robin scheduling algorithm with a time quantum.
+ * Registers a Pybind11 module named "scheduler_cpp" (module doc: "OS Scheduling Algorithms")
+ * and exposes three functions to Python:
+ *  - `fcfs_scheduler(processes)`: First Come First Served scheduling algorithm.
+ *  - `sjf_scheduler(processes)`: Shortest Job First scheduling algorithm.
+ *  - `round_robin_scheduler(processes, time_quantum)`: Round Robin scheduling algorithm with a time quantum.
  */
 PYBIND11_MODULE(scheduler_cpp, m) {
   m.doc() = "OS Scheduling Algorithms";

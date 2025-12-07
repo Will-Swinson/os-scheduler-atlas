@@ -9,7 +9,6 @@ from .models import (
 )
 from sqlalchemy.orm import Session
 from pydantic import Discriminator, Tag
-import scheduler_cpp  # type: ignore
 from typing import List, Dict, Union, Annotated
 import pandas as pd
 from ..ml.feature_engineer import FeatureEngineer
@@ -27,6 +26,7 @@ from ..database.queries import (
 from ..services.simulation_service import calculate_avg_metrics
 from .validators import get_simulate_request_type, to_dict
 from contextlib import asynccontextmanager
+import scheduler_cpp  # type: ignore
 
 
 @asynccontextmanager
@@ -81,7 +81,7 @@ def run_scheduler(
 
     """
 
-    process_dicts = [process.model_dump() for process in processes]
+    process_dicts = [to_dict(process) for process in processes]
 
     if not process_dicts:
         raise ValueError("Cannot analyze processes for empty process lists")
@@ -174,8 +174,10 @@ async def simulate(
 
         time_quantum = request.time_quantum if request.time_quantum is not None else 2
 
+        print("BEFORE: ", processes)
         scheduler_output = run_scheduler(processes, algorithm, time_quantum)
 
+        print("AFTER: ", scheduler_output)
         results = {
             "processes": scheduler_output,
             "total_processes": len(scheduler_output),

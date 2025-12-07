@@ -89,6 +89,7 @@ std::vector<Process> roundRobinScheduler(const std::vector<Process> &processes,
 
     if (currProcess->startTime == 0) {
       currProcess->startTime = std::max(currentTime, currProcess->arrivalTime);
+      currentTime = currProcess->startTime;
     }
 
     int executionTime = std::min(timeQuantum, currProcess->remainingTime);

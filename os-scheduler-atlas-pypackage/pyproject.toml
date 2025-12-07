@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "os-scheduler-atlas"
-version = "0.2.0"
+version = "0.2.1"
 description = "OS Scheduling Algorithms with ML Prediction"
 readme = "README.md"
 authors = [
