@@ -337,7 +337,6 @@ python test.py
 
 ## 🗺️ Roadmap
 
-- [ ] Fix negative waiting time bug
 - [ ] React frontend interface
 - [ ] Docker containerization
 - [ ] Advanced performance metrics
