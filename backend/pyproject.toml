@@ -14,7 +14,7 @@ dependencies = [
   "pytest>=8.3",
   "fastapi==0.120.2",
   "uvicorn[standard]==0.38.0",
-  "os-scheduler-atlas==0.2.1",
+  "os-simulator==0.2.1",
   "sqlalchemy>=2.0.44",
   "alembic>=1.17.1",
   "psycopg2-binary>=2.9.11",

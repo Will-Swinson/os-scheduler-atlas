@@ -1,8 +1,8 @@
-import scheduler_cpp  # type: ignore
 import random
 import numpy as np
 import pandas as pd
 from typing import List, Dict
+from os_simulator import fcfs_scheduler, round_robin_scheduler, sjf_scheduler
 
 
 class WorkloadGenerator:
@@ -113,15 +113,13 @@ class WorkloadGenerator:
         """
         results = {}
 
-        fcfs_results = scheduler_cpp.fcfs_scheduler(processes.copy())
+        fcfs_results = fcfs_scheduler(processes.copy())
         results["fcfs_results"] = fcfs_results
 
-        sjf_results = scheduler_cpp.sjf_scheduler(processes.copy())
+        sjf_results = sjf_scheduler(processes.copy())
         results["sjf_results"] = sjf_results
 
-        round_robin_results = scheduler_cpp.round_robin_scheduler(
-            processes.copy(), time_quantum=4
-        )
+        round_robin_results = round_robin_scheduler(processes.copy(), time_quantum=4)
         results["round_robin_results"] = round_robin_results
 
         return results

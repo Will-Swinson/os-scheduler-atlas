@@ -26,7 +26,7 @@ from ..database.queries import (
 from ..services.simulation_service import calculate_avg_metrics
 from .validators import get_simulate_request_type, to_dict
 from contextlib import asynccontextmanager
-import scheduler_cpp  # type: ignore
+from os_simulator import fcfs_scheduler, round_robin_scheduler, sjf_scheduler
 
 
 @asynccontextmanager
@@ -87,9 +87,9 @@ def run_scheduler(
         raise ValueError("Cannot analyze processes for empty process lists")
 
     algorithms = {
-        "FCFS": scheduler_cpp.fcfs_scheduler,
-        "SJF": scheduler_cpp.sjf_scheduler,
-        "RR": lambda procs: scheduler_cpp.round_robin_scheduler(procs, time_quantum),
+        "FCFS": fcfs_scheduler,
+        "SJF": sjf_scheduler,
+        "RR": lambda procs: round_robin_scheduler(procs, time_quantum),
     }
 
     if algorithm_choice not in algorithms:
