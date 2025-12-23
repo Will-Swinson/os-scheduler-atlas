@@ -1,9 +1,5 @@
-[build-system]
-requires = ["scikit-build-core>=0.9", "pybind11>=2.12", "setuptools", "wheel"]
-build-backend = "scikit_build_core.build"
-
 [project]
-name = "os-scheduler-atlas"
+name = "atlas-os"
 version = "0.1.0"
 description = "OS scheduling simulator backend with ml efficency model and C++ core"
 requires-python = ">=3.11"
@@ -18,11 +14,9 @@ dependencies = [
   "sqlalchemy>=2.0.44",
   "alembic>=1.17.1",
   "psycopg2-binary>=2.9.11",
-  "pandas>=2.3.3"
+  "pydantic-settings>=2.6.1",
+  "pandas>=2.3.3",
+  "scikit-learn>=1.3.0",
+  "joblib>=1.5.3"
 ]
 
-[tool.scikit-build]
-wheel.py-api = "py3"
-cmake.version = ">=3.20"
-cmake.source-dir = "cpp"
-build.verbose = true
